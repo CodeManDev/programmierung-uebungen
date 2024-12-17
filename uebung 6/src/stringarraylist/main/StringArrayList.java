@@ -12,6 +12,10 @@ public class StringArrayList {
         this.arrayList.add(value);
     }
 
+    public String get(int index) {
+        return this.arrayList.get(index);
+    }
+
     public void set(int index, String value) {
         this.arrayList.set(index, value);
     }
