@@ -1,4 +1,4 @@
-public final class PayPal extends PaymentMethod{
+public final class PayPal extends PaymentMethod {
     public PayPal(String holder) {
         super(holder);
     }
