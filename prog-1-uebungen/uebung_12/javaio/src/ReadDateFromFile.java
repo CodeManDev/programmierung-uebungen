@@ -3,6 +3,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Locale;
 
@@ -35,7 +36,7 @@ public class ReadDateFromFile {
         }
 
         try {
-            LocalDate localDate = LocalDate.parse(date);
+            LocalDate localDate = LocalDate.parse(date, DateTimeFormatter.ISO_DATE);
             System.out.printf("Success: Formatted date (%s locale): %s%n", Locale.getDefault().getDisplayLanguage(Locale.ENGLISH), localDate);
         } catch (DateTimeParseException parseException) {
             System.out.printf("Error: Unable to parse date in the file '%s'.%n", args[0]);
