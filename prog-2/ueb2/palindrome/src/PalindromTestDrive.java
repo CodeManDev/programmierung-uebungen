@@ -10,7 +10,7 @@ public class PalindromTestDrive {
 
         List<Palindrom> palindroms = List.of(new PalindromRekursiv(), new PalindromIterativ());
 
-        int maxWordLength = 100;
+        int maxWordLength = 1000;
         long[][] totalTimes = new long[palindroms.size()][maxWordLength];
         long[] times = new long[100];
 
