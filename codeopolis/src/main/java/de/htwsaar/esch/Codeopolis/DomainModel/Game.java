@@ -101,8 +101,10 @@ public class Game extends GameEntity {
      */
     public void startGame() {
         this.state = GameState.RUNNING;
-        while (this.state != GameState.GAMEOVER)
-            gameLoop();
+//        while (this.state != GameState.GAMEOVER)
+//            gameLoop();
+
+        gameLoop();
     }
 
     /**
@@ -125,6 +127,9 @@ public class Game extends GameEntity {
             ui.gameWon("Congratulations, you have led the citizens of your city through " + this.config.getNumberOfYears() + " tough years. You will forever be revered as a hero of the city. A statue of you is be erected in the center of " + this.city.getState().getName() + ". ");
             this.state = GameState.GAMEOVER;
         }
+
+        if (this.state != GameState.GAMEOVER)
+            this.gameLoop();
     }
 
     /**
