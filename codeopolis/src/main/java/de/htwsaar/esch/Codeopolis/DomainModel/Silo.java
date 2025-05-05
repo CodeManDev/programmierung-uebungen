@@ -209,5 +209,27 @@ public class Silo implements Serializable{
         fillLevel -= totalDecayedAmount;
         return totalDecayedAmount;
     }
+
+    public Status getStatus() {
+        return new Status(fillLevel, capacity);
+    }
+
+    public static class Status {
+        private final int fillLevel;
+        private final int capacity;
+
+        private Status(int fillLevel, int capacity) {
+            this.fillLevel = fillLevel;
+            this.capacity = capacity;
+        }
+
+        public int getFillLevel() {
+            return fillLevel;
+        }
+
+        public int getCapacity() {
+            return capacity;
+        }
+    }
 }
 

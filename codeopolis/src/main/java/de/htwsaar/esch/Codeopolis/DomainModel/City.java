@@ -230,7 +230,7 @@ public class City extends GameEntity {
 
         //Calculation of the harvest:
         int[] harvested = new int[Game.GrainType.values().length];
-        Conditions thisYearsConditions = Conditions.generateRandomConditions();
+        Grain.Conditions thisYearsConditions = Grain.Conditions.generateRandomConditions();
 
         for (int i = 0; i < Game.GrainType.values().length; i++) {
             if (this.planted[i] != null) {

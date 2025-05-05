@@ -2,6 +2,8 @@ package de.htwsaar.esch.Codeopolis.DomainModel;
 
 import de.htwsaar.esch.Codeopolis.DomainModel.Harvest.*;
 import java.text.DecimalFormat;
+import java.util.Iterator;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Depot {
     private Silo[] silos;
@@ -44,13 +46,15 @@ public class Depot {
      * @return The total amount of grain stored in the depot for the specified grain type.
      */
     public int getFillLevel(Game.GrainType grainType) {
-        int totalFillLevel = 0;
-        for (Silo silo : silos) {
-            if (silo.getGrainType() == grainType) {
-                totalFillLevel += silo.getFillLevel();
-            }
+        int fillLevel = 0;
+        Iterator<Silo.Status> iterator = iterator(grainType);
+
+        while (iterator.hasNext()) {
+            Silo.Status siloStatus = iterator.next();
+            fillLevel += siloStatus.getFillLevel();
         }
-        return totalFillLevel;
+
+        return fillLevel;
     }
     
     /**
@@ -75,7 +79,7 @@ public class Depot {
      *
      * @return The total amount of bushels stored in the depot.
      */
-    public int getTotalFillLevel(){
+    public int getTotalFillLevel() {
     	int totalBushels = 0;
 
         for (int i = 0; i < this.silos.length; i++) {
@@ -91,13 +95,15 @@ public class Depot {
      * @return The total capacity of the depot for the specified grain type.
      */
     public int getCapacity(Game.GrainType grainType) {
-        int totalCapacity = 0;
-        for (Silo silo : silos) {
-            if (silo.getGrainType() == grainType || silo.getGrainType() == null) {
-                totalCapacity += silo.getCapacity();
-            }
+        int capacity = 0;
+        Iterator<Silo.Status> iterator = iterator(grainType);
+
+        while (iterator.hasNext()) {
+            Silo.Status siloStatus = iterator.next();
+            capacity += siloStatus.getCapacity();
         }
-        return totalCapacity;
+
+        return capacity;
     }
 
     /**
@@ -241,7 +247,6 @@ public class Depot {
         return totalCount;
     }
 
-
     /**
      * Simulates the decay of grain in the depot over time.
      *
@@ -254,7 +259,6 @@ public class Depot {
         }
         return totalDecayedAmount;
     }
-
 
     /**
      * Checks if the depot is fully occupied with grain.
@@ -292,9 +296,6 @@ public class Depot {
 	    }
 	    return result;
 	}
-	
-	
-
 
 	/**
 	 * Returns a string representation of the depot, including information about each silo's grain type, fill level, capacity, and absolute amount of grain.
@@ -346,5 +347,40 @@ public class Depot {
 
 	    return builder.toString();
 	}
+
+    public Iterator<Silo.Status> iterator(Game.GrainType grainType) {
+        return new DepotIterator(grainType);
+    }
+
+    private class DepotIterator implements Iterator<Silo.Status> {
+
+        private final Game.GrainType grainType;
+        private int currentIndex;
+        private Silo.Status nextStatus;
+
+        public DepotIterator(Game.GrainType grainType) {
+            this.grainType = grainType;
+            this.currentIndex = 0;
+            this.nextStatus = null;
+        }
+
+        @Override
+        public boolean hasNext() {
+            this.nextStatus = null;
+            while (this.currentIndex < silos.length) {
+                Silo silo = silos[this.currentIndex++];
+                if (silo.getGrainType() == this.grainType || silo.getGrainType() == null) {
+                    this.nextStatus = silo.getStatus();
+                    break;
+                }
+            }
+            return this.nextStatus != null;
+        }
+
+        @Override
+        public Silo.Status next() {
+            return this.nextStatus;
+        }
+    }
 
 }
