@@ -101,11 +101,10 @@ public class Silo implements Serializable{
     public int takeOut(int amount) {
         int takenAmount = 0;
 
-        LinkedList<Integer> indexToRemove = new LinkedList<>();
+        LinkedList<Harvest> toRemove = new LinkedList<>();
 
         Iterator<Harvest> iterator = this.stock.iterator();
 
-        int index = 0;
         while (iterator.hasNext() && amount > 0) {
             Harvest currentHarvest = iterator.next();
             int taken = currentHarvest.remove(amount);
@@ -114,18 +113,15 @@ public class Silo implements Serializable{
 
             if (currentHarvest.getAmount() == 0) {
                 // Remove empty harvest
-                indexToRemove.addLast(index);
+                toRemove.addLast(currentHarvest);
             }
-            index++;
         }
 
         // Remove empty harvests from the stock
-        Iterator<Integer> removeIterator = indexToRemove.iterator();
-        int removed = 0;
+        Iterator<Harvest> removeIterator = toRemove.iterator();
         while (removeIterator.hasNext()) {
-            int removeIndex = removeIterator.next();
-            this.stock.remove(removeIndex - removed);
-            removed++; // hacky fix für index
+            Harvest emptyHarvest = removeIterator.next();
+            this.stock.remove(emptyHarvest);
         }
 
         this.fillLevel -= takenAmount;

@@ -95,6 +95,26 @@ public class LinkedList<T> {
         return cached.data;
     }
 
+    public void remove(T data) {
+        if (this.isEmpty()) return;
+
+        if (this.head.data.equals(data)) {
+            this.removeFirst();
+            return;
+        }
+
+        Node<T> current = this.head;
+        while (current.next != null && !current.next.data.equals(data))
+            current = current.next;
+
+        if (current.next != null) {
+            Node<T> cached = current.next;
+            current.next = cached.next;
+            cached.next = null;
+            this.size--;
+        }
+    }
+
     public void addAll(LinkedList<T> other) {
         if (other == null || other.isEmpty()) return;
 
