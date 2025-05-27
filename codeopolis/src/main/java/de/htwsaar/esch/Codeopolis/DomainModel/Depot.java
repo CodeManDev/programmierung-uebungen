@@ -326,6 +326,8 @@ public class Depot {
         StringBuilder builder = new StringBuilder("");
         DecimalFormat df = new DecimalFormat("0.00");
 
+        this.silos.sort();
+
         Iterator<Silo> iterator = this.silos.iterator();
 
         int index = 0;

@@ -1,9 +1,11 @@
 package de.htwsaar.esch.Codeopolis.DomainModel;
 
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Objects;
+import java.util.function.Predicate;
 
-public class LinkedList<T> {
+public class LinkedList<T extends Comparable<T>> implements Iterable<T> {
 
     private Node<T> head;
     private int size;
@@ -125,6 +127,77 @@ public class LinkedList<T> {
         }
     }
 
+    // bubblesort
+    public void sort(Comparator<T> comparator) {
+        if (this.size <= 1) return;
+
+        boolean swapped;
+        do {
+            swapped = false;
+            Node<T> current = this.head;
+
+            while (current != null && current.next != null) {
+                if (comparator.compare(current.data, current.next.data) > 0) {
+                    swap(current, current.next);
+                    swapped = true;
+                }
+                current = current.next;
+            }
+        } while (swapped);
+    }
+
+    public void sort() {
+        this.sort(Comparator.naturalOrder());
+    }
+
+    private void swap(Node<T> a, Node<T> b) {
+        T temp = a.data;
+        a.data = b.data;
+        b.data = temp;
+    }
+
+    public LinkedList<T> filter(Predicate<T> predicate) {
+        LinkedList<T> filteredList = new LinkedList<>();
+        Node<T> current = this.head;
+
+        while (current != null) {
+            if (predicate.test(current.data)) {
+                filteredList.addLast(current.data);
+            }
+            current = current.next;
+        }
+
+        return filteredList;
+    }
+
+    public void removeIf(Predicate<T> predicate) {
+        if (this.isEmpty()) return;
+
+        Node<T> current = this.head;
+        Node<T> previous = null;
+
+        while (current != null) {
+            if (predicate.test(current.data)) {
+                if (previous == null) {
+                    // Remove head
+                    this.head = current.next;
+                } else {
+                    previous.next = current.next;
+                }
+                this.size--;
+            } else {
+                previous = current;
+            }
+            current = current.next;
+        }
+    }
+
+    public void addIf(T data, Predicate<T> predicate) {
+        if (predicate.test(data))
+            this.addLast(data);
+    }
+
+    @Override
     public Iterator<T> iterator() {
         return new LinkedListIterator();
     }
@@ -136,7 +209,7 @@ public class LinkedList<T> {
         return this.size == other.size && Objects.equals(this.head, other.head);
     }
 
-    private static class Node<T> {
+    private static class Node<T extends Comparable<?>> {
         private T data;
         private Node<T> next;
 
