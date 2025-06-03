@@ -7,9 +7,7 @@ import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Depot {
-//    private Silo[] silos;
-
-    private LinkedList<Silo> silos;
+    private final LinkedList<Silo> silos;
 
     /**
      * Constructs a Depot object with the specified number of silos and capacity per silo.
@@ -74,12 +72,8 @@ public class Depot {
     public int getTotalFillLevel() {
         int totalBushels = 0;
 
-        Iterator<Silo> iterator = this.silos.iterator();
-
-        while (iterator.hasNext()) {
-            Silo silo = iterator.next();
+        for (Silo silo : this.silos)
             totalBushels += silo.getFillLevel();
-        }
 
         return totalBushels;
     }
@@ -122,16 +116,14 @@ public class Depot {
     }
 
     private boolean storeHarvest(Harvest harvest) {
-        Iterator<Silo> iterator = this.silos.iterator();
+        Game.GrainType grainType = harvest.getGrainType();
 
-        while (iterator.hasNext()) {
-            Silo silo = iterator.next();
-            if (silo.getGrainType() == harvest.getGrainType() || silo.getFillLevel() == 0) {
-                harvest = silo.store(harvest);
-                if (harvest == null) {
-                    return true;
-                }
-            }
+        LinkedList<Silo> filtered = this.silos.filter(silo -> silo.getGrainType() == grainType || silo.getFillLevel() == 0);
+
+        for (Silo silo : filtered) {
+            harvest = silo.store(harvest);
+            if (harvest == null)
+                return true;
         }
 
         return false;
@@ -145,19 +137,15 @@ public class Depot {
      * @return The actual amount of grain taken out from the depot.
      */
     public int takeOut(int amount, Game.GrainType grainType) {
+        LinkedList<Silo> filteredSilos = this.silos.filter(silo -> silo.getGrainType() == grainType);
         int takenAmount = 0;
 
-        Iterator<Silo> iterator = this.silos.iterator();
-        while (iterator.hasNext()) {
-            Silo silo = iterator.next();
-            if (silo.getGrainType() == grainType) {
-                int amountTaken = silo.takeOut(amount);
-                amount -= amountTaken;
-                takenAmount += amountTaken;
-                if (amount <= 0) {
-                    break;
-                }
-            }
+        for (Silo silo : filteredSilos) {
+            int amountTaken = silo.takeOut(amount);
+            amount -= amountTaken;
+            takenAmount += amountTaken;
+            if (amount <= 0)
+                break;
         }
 
         return takenAmount;
@@ -175,19 +163,18 @@ public class Depot {
     public int takeOut(int amount) {
         if (amount >= this.getTotalFillLevel()) {
             int totalAmountOfBushels = this.getTotalFillLevel();
-            Iterator<Silo> iterator = this.silos.iterator();
-            while (iterator.hasNext()) {
-                Silo silo = iterator.next();
+            for (Silo silo : this.silos)
                 silo.emptySilo();
-            }
+
+            // mit Methodenreferenz: (Instanzmethode eines beliebigen Silos)
+            // this.silos.forEach(Silo::emptySilo);
+
             return totalAmountOfBushels;
         }
         int partion = amount / this.silos.size();
         int remainder = amount % this.silos.size();
 
-        Iterator<Silo> iterator = this.silos.iterator();
-        while (iterator.hasNext()) {
-            Silo silo = iterator.next();
+        for (Silo silo : this.silos) {
             if (silo.getFillLevel() < partion) {
                 remainder += partion - silo.getFillLevel();
                 silo.emptySilo();
@@ -215,9 +202,8 @@ public class Depot {
      * @param capacityPerSilo  The capacity per silo.
      */
     public void expand(int numberOfSilos, int capacityPerSilo) {
-        for (int i = numberOfSilos; i > 0; i--) {
+        for (int i = numberOfSilos; i > 0; i--)
             this.silos.addLast(new Silo(capacityPerSilo));
-        }
 
         this.takeOut((int) (numberOfSilos * GameConfig.DEPOT_EXPANSION_COST)); //#Issue42
     }
@@ -228,22 +214,16 @@ public class Depot {
     public void defragment() {
         LinkedList<Harvest> allHarvests = new LinkedList<>();
 
-        Iterator<Silo> siloIterator = this.silos.iterator();
-        while (siloIterator.hasNext()) {
-            Silo silo = siloIterator.next();
+        for (Silo silo : this.silos) {
             LinkedList<Harvest> siloHarvests = silo.emptySilo();
-            if (siloHarvests != null) {
+            if (siloHarvests != null)
                 allHarvests.addAll(siloHarvests);
-            }
         }
 
         // Add all harvests back. Store method takes care that silos are not fragmented.
-        Iterator<Harvest> harvestIterator = allHarvests.iterator();
-        while (harvestIterator.hasNext()) {
-            Harvest harvest = harvestIterator.next();
-            if (harvest != null) {
+        for (Harvest harvest : allHarvests) {
+            if (harvest != null)
                 store(harvest);
-            }
         }
     }
 
@@ -254,11 +234,9 @@ public class Depot {
      */
     private int getTotalHarvestCount() {
         int totalCount = 0;
-        Iterator<Silo> iterator = this.silos.iterator();
-        while (iterator.hasNext()) {
-            Silo silo = iterator.next();
+        for (Silo silo : this.silos)
             totalCount += silo.getHarvestCount();
-        }
+
         return totalCount;
     }
 
@@ -269,11 +247,9 @@ public class Depot {
      */
     public int decay(int currentYear) {
         int totalDecayedAmount = 0;
-        Iterator<Silo> iterator = this.silos.iterator();
-        while (iterator.hasNext()) {
-            Silo silo = iterator.next();
+        for (Silo silo : this.silos)
             totalDecayedAmount += silo.decay(currentYear);
-        }
+
         return totalDecayedAmount;
     }
 
@@ -283,9 +259,7 @@ public class Depot {
      * @return {@code true} if the total fill level of all silos equals or exceeds the total capacity of the storage system, {@code false} otherwise.
      */
     public boolean full() {
-        if (this.getTotalFillLevel() >= this.totalCapacity())
-            return true;
-        return false;
+        return this.getTotalFillLevel() >= this.totalCapacity();
     }
 
     /**
@@ -295,11 +269,9 @@ public class Depot {
      */
     public int totalCapacity() {
         int totalCapacity = 0;
-        Iterator<Silo> iterator = this.silos.iterator();
-        while (iterator.hasNext()) {
-            Silo silo = iterator.next();
+        for (Silo silo : this.silos)
             totalCapacity += silo.getCapacity();
-        }
+
         return totalCapacity;
     }
 
@@ -310,9 +282,9 @@ public class Depot {
      */
     public int[] getBushelsCategorizedByGrainType() {
         int[] result = new int[Game.GrainType.values().length];
-        for (Game.GrainType grainType : Game.GrainType.values()) {
+        for (Game.GrainType grainType : Game.GrainType.values())
             result[grainType.ordinal()] = getFillLevel(grainType);
-        }
+
         return result;
     }
 
@@ -323,16 +295,13 @@ public class Depot {
      */
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder("");
+        StringBuilder builder = new StringBuilder();
         DecimalFormat df = new DecimalFormat("0.00");
 
         this.silos.sort();
 
-        Iterator<Silo> iterator = this.silos.iterator();
-
         int index = 0;
-        while (iterator.hasNext()) {
-            Silo silo = iterator.next();
+        for (Silo silo : this.silos) {
             builder.append("Silo ").append((index++) + 1).append(": ");
 
             String grainName;
@@ -359,12 +328,8 @@ public class Depot {
             int emptyBars = fillBarLength - filledBars;
 
             builder.append("|");
-            for (int j = 0; j < filledBars; j++) {
-                builder.append("=");
-            }
-            for (int j = 0; j < emptyBars; j++) {
-                builder.append("-");
-            }
+            builder.append("=".repeat(Math.max(0, filledBars)));
+            builder.append("-".repeat(Math.max(0, emptyBars)));
             builder.append("| ").append(df.format(fillPercentage)).append("% filled\n");
 
             builder.append("Capacity: ").append(capacity).append(" units\n\n");

@@ -103,10 +103,7 @@ public class Silo implements Serializable, Comparable<Silo> {
 
         LinkedList<Harvest> toRemove = new LinkedList<>();
 
-        Iterator<Harvest> iterator = this.stock.iterator();
-
-        while (iterator.hasNext() && amount > 0) {
-            Harvest currentHarvest = iterator.next();
+        for (Harvest currentHarvest : this.stock) {
             int taken = currentHarvest.remove(amount);
             amount -= taken;
             takenAmount += taken;
@@ -115,14 +112,14 @@ public class Silo implements Serializable, Comparable<Silo> {
                 // Remove empty harvest
                 toRemove.addLast(currentHarvest);
             }
+
+            if (amount <= 0)
+                break;
         }
 
         // Remove empty harvests from the stock
-        Iterator<Harvest> removeIterator = toRemove.iterator();
-        while (removeIterator.hasNext()) {
-            Harvest emptyHarvest = removeIterator.next();
+        for (Harvest emptyHarvest : toRemove)
             this.stock.remove(emptyHarvest);
-        }
 
         this.fillLevel -= takenAmount;
         return takenAmount;
@@ -179,13 +176,10 @@ public class Silo implements Serializable, Comparable<Silo> {
     public int decay(int currentYear) {
         int totalDecayedAmount = 0;
 
-        Iterator<Harvest> iterator = this.stock.iterator();
-        while (iterator.hasNext()) {
-            Harvest currentHarvest = iterator.next();
+        for (Harvest currentHarvest : this.stock)
             totalDecayedAmount += currentHarvest.decay(currentYear);
-        }
 
-        fillLevel -= totalDecayedAmount;
+        this.fillLevel -= totalDecayedAmount;
         return totalDecayedAmount;
     }
 
