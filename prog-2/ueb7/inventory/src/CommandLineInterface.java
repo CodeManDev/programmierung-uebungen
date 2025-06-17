@@ -88,8 +88,7 @@ public class CommandLineInterface implements Interface {
 
         Product product = this.inventory.findProductById(productId);
         if (product != null) {
-            System.out.println("Product found: " + product.getName() + ", Category: " + product.getCategory() +
-                               ", Price: " + product.getPrice() + ", Quantity: " + product.getQuantity());
+            System.out.println(product);
         } else {
             System.out.println("Product not found.");
         }
@@ -105,10 +104,7 @@ public class CommandLineInterface implements Interface {
             System.out.println("No products found with this category.");
         } else {
             System.out.println("Products in category '" + category + "':");
-            for (Product product : products) {
-                System.out.println("ID: " + product.getProductId() + ", Name: " + product.getName() +
-                        ", Price: " + product.getPrice() + ", Quantity: " + product.getQuantity());
-            }
+            products.forEach(System.out::println);
         }
     }
 
@@ -119,24 +115,20 @@ public class CommandLineInterface implements Interface {
             System.out.println("No products in inventory.");
         } else {
             System.out.println("All products in inventory:");
-            for (Product product : products) {
-                System.out.println("ID: " + product.getProductId() + ", Name: " + product.getName() +
-                                   ", Category: " + product.getCategory() + ", Price: " + product.getPrice() +
-                                   ", Quantity: " + product.getQuantity());
-            }
+            products.forEach(System.out::println);
         }
     }
 
     @Override
     public void sortProductsByName() {
-        this.inventory.sortProductsByName();
-        System.out.println("Products sorted by name.");
+        System.out.println("Products sorted by name: ");
+        this.inventory.printSortedProductsByName();
     }
 
     @Override
     public void sortProductsByPrice() {
-        this.inventory.sortProductsByPrice();
-        System.out.println("Products sorted by price.");
+        System.out.println("Products sorted by price: ");
+        this.inventory.printSortedProductsByPrice();
     }
 
     @Override
@@ -148,11 +140,7 @@ public class CommandLineInterface implements Interface {
             System.out.println("No products below the stock threshold.");
         } else {
             System.out.println("Products below the stock threshold:");
-            for (Product product : lowStockProducts) {
-                System.out.println("ID: " + product.getProductId() + ", Name: " + product.getName() +
-                                   ", Category: " + product.getCategory() + ", Price: " + product.getPrice() +
-                                   ", Quantity: " + product.getQuantity());
-            }
+            lowStockProducts.forEach(System.out::println);
         }
     }
 
@@ -182,11 +170,7 @@ public class CommandLineInterface implements Interface {
             System.out.println("No products match the filter criteria.");
         } else {
             System.out.println("Filtered products:");
-            for (Product product : filteredProducts) {
-                System.out.println("ID: " + product.getProductId() + ", Name: " + product.getName() +
-                                   ", Category: " + product.getCategory() + ", Price: " + product.getPrice() +
-                                   ", Quantity: " + product.getQuantity());
-            }
+            filteredProducts.forEach(System.out::println);
         }
     }
 

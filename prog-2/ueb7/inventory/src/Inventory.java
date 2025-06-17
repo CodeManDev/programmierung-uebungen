@@ -40,22 +40,18 @@ public class Inventory {
         return this.inventory.values().stream().toList();
     }
 
-    public void sortProducts(Comparator<Product> comparator) {
-        List<Product> sortedProducts = this.inventory.values().stream()
+    public void printSortedProducts(Comparator<Product> comparator) {
+        this.inventory.values().stream()
                 .sorted(comparator)
-                .toList();
-        this.inventory.clear();
-        for (Product product : sortedProducts) {
-            this.inventory.put(product.getProductId(), product);
-        }
+                .forEach(System.out::println);
     }
 
-    public void sortProductsByPrice() {
-        sortProducts(Comparator.comparingDouble(Product::getPrice));
+    public void printSortedProductsByPrice() {
+        printSortedProducts(Comparator.comparingDouble(Product::getPrice));
     }
 
-    public void sortProductsByName() {
-        sortProducts(Comparator.comparing(Product::getName));
+    public void printSortedProductsByName() {
+        printSortedProducts(Comparator.comparing(Product::getName));
     }
 
     public List<Product> filterProducts(Predicate<Product> predicate) {
